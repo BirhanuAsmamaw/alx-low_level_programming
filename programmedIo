@@ -1,0 +1,90 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+// Register and flag declarations
+char INPR;       // Input register
+bool FGI = false; // Input flag
+char OUTR;       // Output register
+bool FGO = true;  // Output flag
+
+// Memory location
+char LETTER;
+
+// Array to store entered characters and counter
+#define MAX_CHARS 1000
+char char_array[MAX_CHARS];
+int char_count = 0;
+
+// Function to simulate the Input Enable
+void input_enable(char ch) {
+    INPR = ch;
+    FGI = true;
+}
+
+// Function to simulate the Output Enable
+void output_enable() {
+    FGO = true;
+}
+
+// Function to read a character using programmed I/O
+void read_character() {
+    // Polling loop: wait until input flag is set
+    while (!FGI) {
+        // Busy-wait for the input flag to be set
+    }
+    LETTER = INPR;  // Transfer data from input register to memory
+    FGI = false;    // Clear the input flag after reading
+}
+
+// Function to write a character using programmed I/O
+void write_character() {
+    // Polling loop: wait until output flag is set
+    while (!FGO) {
+        // Busy-wait for the output flag to be set
+    }
+    OUTR = LETTER;  // Transfer data from memory to output register
+    FGO = false;    // Clear the output flag after writing
+}
+
+// Function to print the array of entered characters
+void print_char_array() {
+    printf("Characters entered so far: ");
+    for (int i = 0; i < char_count; i++) {
+        printf("%c", char_array[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    while (true) {
+        char input_char;
+
+        // Simulate input
+        printf("Enter a character: ");
+        scanf(" %c", &input_char);
+        input_enable(input_char);
+
+        // Read the character from INPR and store it in LETTER
+        read_character();
+        printf("Character read from INPR and stored in LETTER: %c\n", LETTER);
+
+        // Store the character in the array
+        if (char_count < MAX_CHARS) {
+            char_array[char_count++] = LETTER;
+        } else {
+            printf("Array is full, cannot store more characters.\n");
+        }
+
+        // Simulate output
+        output_enable();
+        write_character();
+        printf("Character written to OUTR from LETTER: %c\n", OUTR);
+
+        // Print the array of entered characters
+        print_char_array();
+    }
+
+    return 0;
+}
